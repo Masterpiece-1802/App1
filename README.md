@@ -85,21 +85,6 @@ A beautiful web application for creating, designing, and sharing shayaris and po
 
 ---
 
-## 📂 Project Structure
-
-verse-craft/
-├── index.html # Main application file
-├── style.css # All styles and responsive design
-├── script.js # Application functionality
-├── app.py # Flask backend (PythonAnywhere)
-├── database.py # SQLite database operations
-├── requirements.txt # Python dependencies
-├── generated/ # Generated images storage
-├── backgrounds/ # Background images
-└── fonts/ # Custom fonts
-
----
-
 ## 🔧 Backend API Endpoints
 
 - `GET /api/backgrounds` → Available backgrounds by theme
