@@ -1,0 +1,2327 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>VerseCraft: Shayari & Poetry Creator</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Great+Vibes&family=Parisienne&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/emoji-picker-element@1.12.0/index.css"
+    />
+    <style>
+      :root {
+        --dark-overlay: rgba(0, 0, 0, 0.3);
+        --card-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        --card-hover-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+        --primary-gradient: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+        --success-gradient: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+      }
+
+      [data-theme="dark"] {
+        --bg-gradient: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        --card-bg: #1e293b;
+        --text-color: #f1f5f9;
+        --border-color: #334155;
+        --input-bg: #1e293b;
+        --input-border: #334155;
+        --input-text: #f1f5f9;
+        --muted-text: #94a3b8;
+        --card-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        --card-hover-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+      }
+
+      body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        min-height: 100vh;
+        color: #2d3748;
+        transition: all 0.3s ease;
+        background-attachment: fixed;
+        padding-bottom: 20px;
+      }
+
+      body[data-theme="dark"] {
+        background: var(--bg-gradient);
+        color: var(--text-color);
+      }
+
+      .navbar {
+        background: var(--primary-gradient) !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        backdrop-filter: blur(10px);
+      }
+
+      .card {
+        box-shadow: var(--card-shadow);
+        border: none;
+        border-radius: 16px;
+        margin-bottom: 25px;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        overflow: hidden;
+        background-color: rgba(255, 255, 255, 0.95);
+        animation: cardAppear 0.5s ease;
+        backdrop-filter: blur(10px);
+      }
+
+      body[data-theme="dark"] .card {
+        background-color: rgba(30, 41, 59, 0.95);
+        box-shadow: var(--card-shadow);
+        color: var(--text-color);
+      }
+
+      .card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--card-hover-shadow);
+      }
+
+      .card-header {
+        background: var(--primary-gradient);
+        color: white;
+        border-radius: 16px 16px 0 0 !important;
+        padding: 15px 20px;
+        border-bottom: none;
+      }
+
+      .btn {
+        border-radius: 12px;
+        padding: 12px 24px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .btn-primary {
+        background: var(--primary-gradient);
+        border: none;
+      }
+
+      .btn-primary:hover {
+        background: linear-gradient(135deg, #5c4fcf 0%, #9189e6 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 15px rgba(108, 92, 231, 0.4);
+      }
+
+      .btn-success {
+        background: var(--success-gradient);
+        border: none;
+      }
+
+      .btn-success:hover {
+        background: linear-gradient(135deg, #00a685 0%, #00beb8 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 15px rgba(0, 184, 148, 0.4);
+      }
+
+      .btn-outline-primary {
+        border: 2px solid #6c5ce7;
+        color: #6c5ce7;
+        background: transparent;
+      }
+
+      .btn-outline-primary:hover {
+        background: #6c5ce7;
+        color: white;
+        transform: translateY(-2px);
+      }
+
+      /* 9:16 Aspect Ratio Preview */
+      #previewContainer {
+        color: white;
+        width: 100%;
+        height: 0;
+        padding-bottom: 177.8%; /* 9:16 aspect ratio */
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        border-radius: 20px;
+        font-family: "Georgia", serif;
+        background-size: cover;
+        background-position: center;
+        transition: all 0.3s ease;
+        overflow: hidden;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+      }
+
+      #previewText {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        margin: 0;
+        line-height: 1.6;
+        padding: 40px;
+        text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.8);
+        max-width: 90%;
+        width: 100%;
+        transition: all 0.3s ease;
+        animation: fadeIn 0.5s ease;
+        font-size: 1.8rem;
+      }
+
+      /* Theme-specific background styles with actual images */
+      #previewContainer.theme-default {
+        background-image: linear-gradient(
+            var(--dark-overlay),
+            var(--dark-overlay)
+          ),
+          url("https://images.unsplash.com/photo-1519681393784-d120267933ba");
+      }
+
+      #previewContainer.theme-romantic {
+        background-image: linear-gradient(
+            var(--dark-overlay),
+            var(--dark-overlay)
+          ),
+          url("https://images.unsplash.com/photo-1530825894095-9c184b068fcb");
+      }
+
+      #previewContainer.theme-sad {
+        background-image: linear-gradient(
+            var(--dark-overlay),
+            var(--dark-overlay)
+          ),
+          url("https://images.unsplash.com/photo-1519791883288-dc8bd696e667");
+      }
+
+      #previewContainer.theme-motivational {
+        background-image: linear-gradient(
+            var(--dark-overlay),
+            var(--dark-overlay)
+          ),
+          url("https://images.unsplash.com/photo-1506744038136-46273834b3fb");
+      }
+
+      .post-item {
+        border-bottom: 1px solid #eee;
+        padding: 15px 0;
+        transition: background-color 0.3s ease;
+        color: inherit;
+        cursor: pointer;
+      }
+
+      body[data-theme="dark"] .post-item {
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .post-item:hover {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+      }
+
+      body[data-theme="dark"] .post-item:hover {
+        background-color: #334155;
+      }
+
+      .post-item:last-child {
+        border-bottom: none;
+      }
+
+      .post-content {
+        font-style: italic;
+        margin-bottom: 8px;
+        font-size: 1.1rem;
+        line-height: 1.6;
+        color: inherit;
+      }
+
+      .post-meta {
+        font-size: 0.85rem;
+        color: #6c757d;
+      }
+
+      body[data-theme="dark"] .post-meta {
+        color: var(--muted-text);
+      }
+
+      .filter-section {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 20px;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.05);
+      }
+
+      body[data-theme="dark"] .filter-section {
+        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.2);
+      }
+
+      .loading {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: #fff;
+        animation: spin 1s ease-in-out infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translate(-50%, -40%);
+        }
+        to {
+          opacity: 1;
+          transform: translate(-50%, -50%);
+        }
+      }
+
+      @keyframes cardAppear {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .create-card {
+        animation-delay: 0.1s;
+      }
+      .preview-card {
+        animation-delay: 0.2s;
+      }
+      .search-card {
+        animation-delay: 0.3s;
+      }
+      .recent-card {
+        animation-delay: 0.4s;
+      }
+
+      .custom-select {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23343a40' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 0.75rem center;
+        background-size: 16px 12px;
+        border-radius: 10px;
+        padding: 10px 15px;
+      }
+
+      body[data-theme="dark"] .custom-select {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23f1f5f9' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+      }
+
+      .form-control {
+        border-radius: 10px;
+        padding: 12px 15px;
+        border: 2px solid #e9ecef;
+        transition: all 0.3s ease;
+        background-color: #fff;
+        color: #333;
+      }
+
+      body[data-theme="dark"] .form-control {
+        background-color: var(--input-bg);
+        border-color: var(--input-border);
+        color: var(--input-text);
+      }
+
+      .form-control:focus {
+        border-color: #6c5ce7;
+        box-shadow: 0 0 0 0.25rem rgba(108, 92, 231, 0.25);
+      }
+
+      .background-option {
+        width: 85px;
+        height: 85px;
+        object-fit: cover;
+        border-radius: 12px;
+        cursor: pointer;
+        border: 3px solid transparent;
+        transition: all 0.3s ease;
+      }
+
+      .background-option:hover {
+        transform: scale(1.1);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.3);
+      }
+
+      .background-option.selected {
+        border-color: #6c5ce7;
+        box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.3),
+          0 8px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .font-option {
+        padding: 15px;
+        border: 2px solid #e9ecef;
+        border-radius: 10px;
+        cursor: pointer;
+        margin-bottom: 10px;
+        transition: all 0.3s ease;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #fff;
+        color: #333;
+      }
+
+      body[data-theme="dark"] .font-option {
+        border-color: var(--border-color);
+        background-color: var(--card-bg);
+        color: var(--text-color);
+      }
+
+      .font-option:hover {
+        background-color: #f8f9fa;
+        transform: translateX(5px);
+      }
+
+      body[data-theme="dark"] .font-option:hover {
+        background-color: #334155;
+      }
+
+      .font-option.selected {
+        border-color: #6c5ce7;
+        background-color: rgba(108, 92, 231, 0.1);
+        transform: translateX(10px);
+      }
+
+      body[data-theme="dark"] .font-option.selected {
+        background-color: rgba(108, 92, 231, 0.3);
+      }
+
+      .color-option {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+      }
+
+      .color-option:hover {
+        transform: scale(1.2);
+        box-shadow: 0 0 10px rgba(108, 92, 231, 0.5);
+      }
+
+      .color-option.selected {
+        border: 3px solid #495057;
+        box-shadow: 0 0 0 2px white, 0 0 0 4px #495057;
+      }
+
+      body[data-theme="dark"] .color-option.selected {
+        box-shadow: 0 0 0 2px var(--card-bg), 0 0 0 4px #6c5ce7;
+      }
+
+      .dancing-script-font {
+        font-family: "Dancing Script", cursive;
+        font-size: 1.2em;
+      }
+
+      .great-vibes-font {
+        font-family: "Great Vibes", cursive;
+        font-size: 1.2em;
+      }
+
+      .parisienne-font {
+        font-family: "Parisienne", cursive;
+        font-size: 1.2em;
+      }
+
+      .arial-font {
+        font-family: Arial, sans-serif;
+      }
+
+      .navbar-brand {
+        font-weight: 700;
+        font-size: 1.5rem;
+      }
+
+      .footer {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 20px 0;
+        margin-top: 40px;
+        text-align: center;
+        backdrop-filter: blur(10px);
+      }
+
+      /* Emoji Picker Styling */
+      .emoji-picker-container {
+        position: absolute;
+        z-index: 1000;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      emoji-picker {
+        --num-columns: 8;
+        --emoji-size: 1.5rem;
+        --background: #fff;
+        --border-color: #e9ecef;
+        --category-font-size: 0.9rem;
+        --font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        --indicator-color: #6c5ce7;
+      }
+
+      body[data-theme="dark"] emoji-picker {
+        --background: #1e293b;
+        --border-color: #334155;
+        --text-color: #f1f5f9;
+        --indicator-color: #a29bfe;
+      }
+
+      /* Text formatting classes */
+      .text-bold {
+        font-weight: bold !important;
+      }
+
+      .text-italic {
+        font-style: italic !important;
+      }
+
+      .text-underline {
+        text-decoration: underline !important;
+      }
+
+      /* Floating animation for cards */
+      @keyframes float {
+        0% {
+          transform: translateY(0px);
+        }
+        50% {
+          transform: translateY(-10px);
+        }
+        100% {
+          transform: translateY(0px);
+        }
+      }
+
+      .card:hover {
+        animation: float 3s ease-in-out infinite;
+      }
+
+      /* Pulse animation for buttons */
+      @keyframes pulse {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .btn:hover {
+        animation: pulse 1.5s infinite;
+      }
+
+      /* Glow effect for active elements */
+      .glow {
+        box-shadow: 0 0 15px rgba(108, 92, 231, 0.5);
+      }
+
+      /* Text selection styling */
+      ::selection {
+        background: rgba(108, 92, 231, 0.3);
+      }
+
+      body[data-theme="dark"] ::selection {
+        background: rgba(162, 155, 254, 0.3);
+      }
+
+      /* Form text styling */
+      .form-text {
+        color: #6c757d !important;
+      }
+
+      body[data-theme="dark"] .form-text {
+        color: var(--muted-text) !important;
+      }
+
+      /* Format button active state */
+      .format-btn.active {
+        background-color: #6c5ce7;
+        color: white;
+      }
+
+      body[data-theme="dark"] .format-btn.active {
+        background-color: #6c5ce7;
+        color: white;
+      }
+
+      @media (max-width: 768px) {
+        .card {
+          margin-bottom: 15px;
+        }
+
+        #previewContainer {
+          padding-bottom: 177.8%; /* Maintain 9:16 aspect ratio */
+        }
+
+        .background-option {
+          width: 70px;
+          height: 70px;
+        }
+
+        .btn {
+          padding: 10px 18px;
+          font-size: 0.9rem;
+        }
+
+        #previewText {
+          padding: 20px;
+          font-size: 1.4rem;
+        }
+
+        /* Reorder columns for mobile */
+        .order-1 {
+          order: 1;
+        }
+        .order-3 {
+          order: 2;
+        }
+        .order-4 {
+          order: 3;
+        }
+        .order-5 {
+          order: 4;
+        }
+      }
+
+      /* Custom scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+      }
+
+      body[data-theme="dark"] ::-webkit-scrollbar-track {
+        background: #1e293b;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: var(--primary-gradient);
+        border-radius: 10px;
+      }
+
+      ::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(135deg, #5c4fcf 0%, #9189e6 100%);
+      }
+
+      /* Toast notification */
+      .toast-container {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1050;
+      }
+
+      .toast {
+        background-color: rgba(255, 255, 255, 0.95);
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        padding: 12px 16px;
+        display: flex;
+        align-items: center;
+        animation: toastIn 0.3s ease, toastOut 0.3s ease 2.7s forwards;
+        color: #333;
+      }
+
+      body[data-theme="dark"] .toast {
+        background-color: rgba(30, 41, 59, 0.95);
+        color: var(--text-color);
+      }
+
+      @keyframes toastIn {
+        from {
+          transform: translateY(100px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+
+      @keyframes toastOut {
+        from {
+          transform: translateY(0);
+          opacity: 1;
+        }
+        to {
+          transform: translateY(100px);
+          opacity: 0;
+        }
+      }
+
+      /* Badge styling */
+      .badge {
+        font-weight: 500;
+      }
+
+      .theme-badge {
+        display: inline-block;
+        padding: 0.25em 0.6em;
+        font-size: 75%;
+        font-weight: 700;
+        line-height: 1;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: baseline;
+        border-radius: 0.375rem;
+        background: var(--primary-gradient);
+        color: white;
+      }
+
+      /* UI Improvements */
+      .tooltip-icon {
+        cursor: pointer;
+        color: #6c757d;
+        transition: color 0.3s ease;
+      }
+
+      .tooltip-icon:hover {
+        color: #6c5ce7;
+      }
+
+      .hint-text {
+        font-size: 0.85rem;
+        color: #6c757d;
+        margin-top: 5px;
+      }
+
+      body[data-theme="dark"] .hint-text {
+        color: var(--muted-text);
+      }
+
+      .keyboard-shortcut {
+        background: rgba(108, 92, 231, 0.1);
+        border-radius: 4px;
+        padding: 2px 6px;
+        font-size: 0.8rem;
+        border: 1px solid rgba(108, 92, 231, 0.2);
+      }
+
+      body[data-theme="dark"] .keyboard-shortcut {
+        background: rgba(162, 155, 254, 0.1);
+        border-color: rgba(162, 155, 254, 0.2);
+      }
+
+      .position-controls {
+        display: flex;
+        gap: 5px;
+        margin-top: 10px;
+      }
+
+      .position-btn {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+      }
+
+      .text-position-indicator {
+        font-size: 0.85rem;
+        margin-top: 10px;
+        text-align: center;
+      }
+
+      .auto-save-indicator {
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.85rem;
+        color: #28a745;
+      }
+
+      body[data-theme="dark"] .auto-save-indicator {
+        color: #51cf66;
+      }
+
+      .blink {
+        animation: blink 2s infinite;
+      }
+
+      @keyframes blink {
+        0%,
+        50% {
+          opacity: 1;
+        }
+        51%,
+        100% {
+          opacity: 0.5;
+        }
+      }
+
+      .editing-panel {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 12px;
+        padding: 15px;
+        margin-bottom: 20px;
+      }
+
+      body[data-theme="dark"] .editing-panel {
+        background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+      }
+
+      .editing-toggle {
+        cursor: pointer;
+        padding: 10px;
+        border-radius: 8px;
+        background: rgba(108, 92, 231, 0.1);
+        margin-bottom: 15px;
+      }
+
+      .editing-content {
+        display: none;
+        padding-top: 15px;
+      }
+
+      .editing-content.show {
+        display: block;
+      }
+
+      .copy-section-btn {
+        margin-top: 15px;
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body data-theme="light">
+    <nav class="navbar navbar-expand-lg navbar-dark">
+      <div class="container">
+        <span class="navbar-brand mb-0 h1">
+          <i class="fas fa-pen-fancy me-2"></i>VerseCraft
+        </span>
+        <div class="d-flex align-items-center">
+          <button id="themeToggle" class="btn btn-sm btn-outline-light me-2">
+            <i class="fas fa-moon"></i>
+          </button>
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarNav"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+        </div>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link active" href="#"
+                ><i class="fas fa-home me-1"></i> Home</a
+              >
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container mt-4">
+      <div class="row">
+        <!-- Create section -->
+        <div class="col-lg-6 order-1 order-lg-1">
+          <div class="card create-card">
+            <div
+              class="card-header d-flex justify-content-between align-items-center"
+            >
+              <h5><i class="fas fa-plus-circle me-2"></i>Create New Shayari</h5>
+              <span class="auto-save-indicator" id="autoSaveIndicator">
+                <i class="fas fa-save me-1"></i> Auto-save enabled
+              </span>
+            </div>
+            <div class="card-body">
+              <div class="editing-panel">
+                <div class="editing-toggle" id="editingToggle">
+                  <i class="fas fa-edit me-2"></i> Advanced Editing
+                  <i class="fas fa-chevron-down float-end"></i>
+                </div>
+                <div class="editing-content" id="editingContent">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="mb-3">
+                        <label class="form-label">Font Style</label>
+                        <div id="fontOptions">
+                          <div
+                            class="spinner-border spinner-border-sm"
+                            role="status"
+                          >
+                            <span class="visually-hidden">Loading...</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="mb-3">
+                        <label for="fontSize" class="form-label"
+                          >Font Size</label
+                        >
+                        <input
+                          type="range"
+                          class="form-range"
+                          id="fontSize"
+                          min="16"
+                          max="48"
+                          value="24"
+                        />
+                        <div class="form-text text-center">
+                          <span id="fontSizeValue">24px</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Text Formatting</label>
+                    <div class="d-flex flex-wrap gap-2">
+                      <button
+                        id="boldBtn"
+                        class="btn btn-outline-secondary format-btn"
+                        data-format="bold"
+                      >
+                        <i class="fas fa-bold"></i>
+                      </button>
+                      <button
+                        id="italicBtn"
+                        class="btn btn-outline-secondary format-btn"
+                        data-format="italic"
+                      >
+                        <i class="fas fa-italic"></i>
+                      </button>
+                      <button
+                        id="underlineBtn"
+                        class="btn btn-outline-secondary format-btn"
+                        data-format="underline"
+                      >
+                        <i class="fas fa-underline"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Text Color</label>
+                    <div id="colorOptions" class="d-flex flex-wrap gap-2">
+                      <div
+                        class="color-option selected"
+                        data-color="#ffffff"
+                        style="
+                          background: linear-gradient(135deg, #ffffff, #e6e6e6);
+                          border: 1px solid #dee2e6;
+                        "
+                      ></div>
+                      <div
+                        class="color-option"
+                        data-color="#ff6b6b"
+                        style="
+                          background: linear-gradient(135deg, #ff6b6b, #ff3838);
+                        "
+                      ></div>
+                      <div
+                        class="color-option"
+                        data-color="#4ecdc4"
+                        style="
+                          background: linear-gradient(135deg, #4ecdc4, #2a9d8f);
+                        "
+                      ></div>
+                      <div
+                        class="color-option"
+                        data-color="#ffe66d"
+                        style="
+                          background: linear-gradient(135deg, #ffe66d, #f9c74f);
+                        "
+                      ></div>
+                      <div
+                        class="color-option"
+                        data-color="#ff9f1c"
+                        style="
+                          background: linear-gradient(135deg, #ff9f1c, #f3722c);
+                        "
+                      ></div>
+                      <div
+                        class="color-option"
+                        data-color="#a29bfe"
+                        style="
+                          background: linear-gradient(135deg, #a29bfe, #6c5ce7);
+                        "
+                      ></div>
+                      <div
+                        class="color-option"
+                        data-color="#fd79a8"
+                        style="
+                          background: linear-gradient(135deg, #fd79a8, #e84393);
+                        "
+                      ></div>
+                      <div
+                        class="color-option"
+                        data-color="#00cec9"
+                        style="
+                          background: linear-gradient(135deg, #00cec9, #00b894);
+                        "
+                      ></div>
+                    </div>
+                  </div>
+
+                  <div class="mb-3">
+                    <label class="form-label">Text Position</label>
+                    <div class="position-controls">
+                      <button
+                        id="positionUp"
+                        class="btn btn-outline-secondary position-btn"
+                      >
+                        <i class="fas fa-arrow-up"></i>
+                      </button>
+                      <button
+                        id="positionDown"
+                        class="btn btn-outline-secondary position-btn"
+                      >
+                        <i class="fas fa-arrow-down"></i>
+                      </button>
+                      <button
+                        id="positionLeft"
+                        class="btn btn-outline-secondary position-btn"
+                      >
+                        <i class="fas fa-arrow-left"></i>
+                      </button>
+                      <button
+                        id="positionRight"
+                        class="btn btn-outline-secondary position-btn"
+                      >
+                        <i class="fas fa-arrow-right"></i>
+                      </button>
+                      <button
+                        id="resetPosition"
+                        class="btn btn-outline-secondary position-btn"
+                      >
+                        <i class="fas fa-sync-alt"></i>
+                      </button>
+                    </div>
+                    <div class="text-position-indicator">
+                      Position: <span id="positionX">50%</span>,
+                      <span id="positionY">50%</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="shayariContent" class="form-label"
+                  >Your Shayari/Poem</label
+                >
+                <div class="position-relative">
+                  <textarea
+                    class="form-control"
+                    id="shayariContent"
+                    rows="5"
+                    placeholder="Enter your beautiful shayari here..."
+                  ></textarea>
+                  <button
+                    id="emojiBtn"
+                    class="btn btn-sm btn-outline-secondary position-absolute"
+                    style="right: 10px; bottom: 10px"
+                  >
+                    <i class="far fa-smile"></i>
+                  </button>
+                </div>
+                <div class="form-text">
+                  Character count: <span id="charCount">0</span> | Lines:
+                  <span id="lineCount">1</span>
+                  <span class="keyboard-shortcut ms-2">Ctrl+E for Emojis</span>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="themeSelect" class="form-label">Theme</label>
+                <select class="form-select" id="themeSelect">
+                  <option value="default">Default</option>
+                  <option value="romantic">Romantic</option>
+                  <option value="sad">Sad</option>
+                  <option value="motivational">Motivational</option>
+                </select>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label">Background Image</label>
+                <div id="backgroundOptions" class="d-flex flex-wrap gap-2 mb-2">
+                  <div class="text-center w-100">
+                    <div class="spinner-border spinner-border-sm" role="status">
+                      <span class="visually-hidden">Loading...</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="tagsInput" class="form-label"
+                  >Tags (comma separated)</label
+                >
+                <input
+                  type="text"
+                  class="form-control"
+                  id="tagsInput"
+                  placeholder="love, sadness, inspiration"
+                />
+              </div>
+
+              <div class="d-grid gap-2 d-md-flex">
+                <button id="copyBtn" class="btn btn-info flex-fill">
+                  <i class="fas fa-copy me-1"></i> Copy Text
+                </button>
+                <button id="speakBtn" class="btn btn-warning flex-fill">
+                  <i class="fas fa-volume-up me-1"></i> Speak
+                </button>
+                <button id="saveBtn" class="btn btn-primary flex-fill">
+                  <i class="fas fa-save me-1"></i> Save
+                </button>
+                <button id="generateBtn" class="btn btn-success flex-fill">
+                  <i class="fas fa-image me-1"></i> Generate
+                </button>
+              </div>
+
+              <div class="mt-3 d-flex gap-2 flex-wrap">
+                <button id="shareFb" class="btn btn-primary btn-sm">
+                  <i class="fab fa-facebook me-1"></i> Facebook
+                </button>
+                <button id="shareTwitter" class="btn btn-info btn-sm">
+                  <i class="fab fa-twitter me-1"></i> Twitter
+                </button>
+                <button id="shareInstagram" class="btn btn-danger btn-sm">
+                  <i class="fab fa-instagram me-1"></i> Instagram
+                </button>
+                <button id="shareWhatsapp" class="btn btn-success btn-sm">
+                  <i class="fab fa-whatsapp me-1"></i> WhatsApp
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Preview section -->
+        <div class="col-lg-6 order-3 order-lg-2">
+          <div class="card preview-card">
+            <div
+              class="card-header d-flex justify-content-between align-items-center"
+            >
+              <h5><i class="fas fa-eye me-2"></i>Preview</h5>
+              <span class="theme-badge" id="currentThemeBadge">Default</span>
+            </div>
+            <div class="card-body">
+              <div id="previewContainer" class="theme-default">
+                <p id="previewText">Your shayari will appear here</p>
+              </div>
+              <div class="mt-3 text-center">
+                <a
+                  id="downloadLink"
+                  class="btn btn-secondary"
+                  style="display: none"
+                >
+                  <i class="fas fa-download me-1"></i> Download Image
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Search section -->
+        <div class="col-lg-6 order-4 order-lg-3">
+          <div class="card search-card mt-4">
+            <div
+              class="card-header d-flex justify-content-between align-items-center"
+            >
+              <h5><i class="fas fa-search me-2"></i>Search & Filter</h5>
+              <button
+                id="copySearchResults"
+                class="btn btn-sm btn-outline-primary"
+              >
+                <i class="fas fa-copy"></i> Copy All
+              </button>
+            </div>
+            <div class="card-body">
+              <div class="filter-section">
+                <div class="row g-2">
+                  <div class="col-md-6">
+                    <label for="searchInput" class="form-label"
+                      >Search Text</label
+                    >
+                    <input
+                      type="text"
+                      id="searchInput"
+                      class="form-control"
+                      placeholder="Search shayaris..."
+                    />
+                  </div>
+                  <div class="col-md-6">
+                    <label for="themeFilter" class="form-label"
+                      >Filter by Theme</label
+                    >
+                    <select class="form-select" id="themeFilter">
+                      <option value="">All Themes</option>
+                      <option value="default">Default</option>
+                      <option value="romantic">Romantic</option>
+                      <option value="sad">Sad</option>
+                      <option value="motivational">Motivational</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="tagFilter" class="form-label"
+                      >Filter by Tag</label
+                    >
+                    <input
+                      type="text"
+                      id="tagFilter"
+                      class="form-control"
+                      placeholder="Enter tag..."
+                    />
+                  </div>
+                  <div class="col-md-6">
+                    <label for="sortSelect" class="form-label">Sort By</label>
+                    <select class="form-select" id="sortSelect">
+                      <option value="date_desc">Newest First</option>
+                      <option value="date_asc">Oldest First</option>
+                      <option value="theme">By Theme</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <button id="searchBtn" class="btn btn-primary w-100 mt-3">
+                <i class="fas fa-search me-1"></i> Apply Filters
+              </button>
+
+              <div id="searchResults" class="mt-3"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent section -->
+        <div class="col-lg-6 order-5 order-lg-4">
+          <div class="card recent-card mt-4">
+            <div
+              class="card-header d-flex justify-content-between align-items-center"
+            >
+              <h5><i class="fas fa-history me-2"></i>Recent Shayaris</h5>
+              <div>
+                <button
+                  id="copyRecentShayaris"
+                  class="btn btn-sm btn-outline-primary me-2"
+                >
+                  <i class="fas fa-copy"></i> Copy All
+                </button>
+                <button id="refreshBtn" class="btn btn-sm btn-outline-primary">
+                  <i class="fas fa-sync-alt"></i>
+                </button>
+              </div>
+            </div>
+            <div class="card-body">
+              <div id="recentList">
+                <div class="text-center">
+                  <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Emoji Picker (hidden by default) -->
+    <div
+      id="emojiPickerContainer"
+      class="emoji-picker-container"
+      style="display: none; position: absolute; z-index: 1000"
+    >
+      <emoji-picker id="emojiPicker"></emoji-picker>
+    </div>
+
+    <footer class="footer mt-5">
+      <div class="container">
+        <p class="mb-0">
+          © 2023 VerseCraft: Shayari & Poetry Creator. All rights reserved.
+        </p>
+        <p class="mb-0">
+          Crafted with <i class="fas fa-heart text-danger"></i> for poetry
+          lovers
+        </p>
+      </div>
+    </footer>
+
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/emoji-picker-element@1.12.0/index.js"
+    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script>
+      // Global variables
+      let availableBackgrounds = {};
+      let selectedBackground = "";
+      let selectedFont = "DancingScript";
+      let selectedColor = "#ffffff";
+      let isLoading = false;
+      let textPosition = { x: 50, y: 50 }; // Percentage values for positioning
+      let textFormatting = {
+        bold: false,
+        italic: false,
+        underline: false,
+      };
+      let autoSaveTimer = null;
+      let isAutoSaving = false;
+
+      // Initialize the application
+      document.addEventListener("DOMContentLoaded", function () {
+        loadRecentPosts();
+        loadFontOptions();
+        loadBackgroundOptions("default");
+        setupColorOptions();
+        updatePreviewTheme();
+        adjustPreviewFontSize();
+        setupEventListeners();
+        setupEmojiPicker();
+        setupKeyboardShortcuts();
+        setupTextPositioning();
+        setupEditingToggle();
+
+        // Apply saved theme if exists
+        const savedTheme = localStorage.getItem("theme");
+        if (savedTheme) {
+          document.body.setAttribute("data-theme", savedTheme);
+          const themeIcon = document.querySelector("#themeToggle i");
+          if (savedTheme === "dark") {
+            themeIcon.className = "fas fa-sun";
+          } else {
+            themeIcon.className = "fas fa-moon";
+          }
+        }
+
+        // Load draft if exists
+        const draft = localStorage.getItem("shayariDraft");
+        if (draft) {
+          document.getElementById("shayariContent").value = draft;
+          updatePreview();
+          updateCharCount();
+          showToast("Draft restored", "info");
+        }
+      });
+
+      // Setup editing toggle
+      function setupEditingToggle() {
+        const editingToggle = document.getElementById("editingToggle");
+        const editingContent = document.getElementById("editingContent");
+
+        editingToggle.addEventListener("click", function () {
+          editingContent.classList.toggle("show");
+          const icon = editingToggle.querySelector(".fa-chevron-down");
+          icon.classList.toggle("fa-chevron-down");
+          icon.classList.toggle("fa-chevron-up");
+        });
+      }
+
+      // Set up all event listeners
+      function setupEventListeners() {
+        // Update preview as user types
+        document
+          .getElementById("shayariContent")
+          .addEventListener("input", function () {
+            const text = this.value;
+            document.getElementById("previewText").innerText = text;
+            document.getElementById("charCount").textContent = text.length;
+            updatePreviewTheme();
+            adjustPreviewFontSize();
+            updatePreviewFont();
+            updatePreviewColor();
+            updateTextFormatting();
+            updateCharCount();
+            debounceAutoSave();
+          });
+
+        // Update preview theme when selected
+        document
+          .getElementById("themeSelect")
+          .addEventListener("change", function () {
+            updatePreviewTheme();
+            loadBackgroundOptions(this.value);
+            document.getElementById("currentThemeBadge").textContent =
+              this.value.charAt(0).toUpperCase() + this.value.slice(1);
+          });
+
+        // Font size slider
+        document
+          .getElementById("fontSize")
+          .addEventListener("input", function () {
+            document.getElementById("fontSizeValue").textContent =
+              this.value + "px";
+            document.getElementById("previewText").style.fontSize =
+              this.value + "px";
+            this.dataset.manual = "true";
+          });
+
+        // Format buttons
+        document.querySelectorAll(".format-btn").forEach((btn) => {
+          btn.addEventListener("click", function () {
+            const format = this.dataset.format;
+            textFormatting[format] = !textFormatting[format];
+            this.classList.toggle("active", textFormatting[format]);
+            updateTextFormatting();
+          });
+        });
+
+        // Save shayari to database
+        document
+          .getElementById("saveBtn")
+          .addEventListener("click", saveShayari);
+
+        // Generate image
+        document
+          .getElementById("generateBtn")
+          .addEventListener("click", generateImage);
+
+        // Search functionality
+        document
+          .getElementById("searchBtn")
+          .addEventListener("click", searchShayaris);
+
+        // Theme toggle
+        document
+          .getElementById("themeToggle")
+          .addEventListener("click", toggleTheme);
+
+        // Copy to clipboard
+        document
+          .getElementById("copyBtn")
+          .addEventListener("click", copyToClipboard);
+
+        // Text to speech
+        document
+          .getElementById("speakBtn")
+          .addEventListener("click", textToSpeech);
+
+        // Social sharing
+        document
+          .getElementById("shareFb")
+          .addEventListener("click", () => shareOnSocial("facebook"));
+        document
+          .getElementById("shareTwitter")
+          .addEventListener("click", () => shareOnSocial("twitter"));
+        document
+          .getElementById("shareInstagram")
+          .addEventListener("click", () => shareOnSocial("instagram"));
+        document
+          .getElementById("shareWhatsapp")
+          .addEventListener("click", () => shareOnSocial("whatsapp"));
+
+        // Refresh recent posts
+        document
+          .getElementById("refreshBtn")
+          .addEventListener("click", loadRecentPosts);
+
+        // Emoji button
+        document
+          .getElementById("emojiBtn")
+          .addEventListener("click", toggleEmojiPicker);
+
+        // Copy search results
+        document
+          .getElementById("copySearchResults")
+          .addEventListener("click", copySearchResults);
+
+        // Copy recent shayaris
+        document
+          .getElementById("copyRecentShayaris")
+          .addEventListener("click", copyRecentShayaris);
+      }
+
+      // Setup emoji picker
+      function setupEmojiPicker() {
+        const picker = document.getElementById("emojiPicker");
+        const container = document.getElementById("emojiPickerContainer");
+        const emojiBtn = document.getElementById("emojiBtn");
+
+        picker.addEventListener("emoji-click", (event) => {
+          const textarea = document.getElementById("shayariContent");
+          const cursorPosition = textarea.selectionStart;
+          const textBefore = textarea.value.substring(0, cursorPosition);
+          const textAfter = textarea.value.substring(cursorPosition);
+
+          textarea.value = textBefore + event.detail.unicode + textAfter;
+          textarea.focus();
+          textarea.selectionEnd = cursorPosition + event.detail.unicode.length;
+
+          // Update preview
+          document.getElementById("previewText").innerText = textarea.value;
+          container.style.display = "none";
+          updateCharCount();
+        });
+
+        // Close emoji picker when clicking outside
+        document.addEventListener("click", function (event) {
+          if (
+            !emojiBtn.contains(event.target) &&
+            !container.contains(event.target)
+          ) {
+            container.style.display = "none";
+          }
+        });
+      }
+
+      // Toggle emoji picker visibility
+      function toggleEmojiPicker() {
+        const container = document.getElementById("emojiPickerContainer");
+        const emojiBtn = document.getElementById("emojiBtn");
+
+        if (container.style.display === "block") {
+          container.style.display = "none";
+        } else {
+          // Position the picker near the button
+          const rect = emojiBtn.getBoundingClientRect();
+          container.style.position = "fixed";
+          container.style.top = rect.bottom + window.scrollY + 5 + "px";
+          container.style.right = window.innerWidth - rect.right + "px";
+          container.style.display = "block";
+        }
+      }
+
+      // Setup keyboard shortcuts
+      function setupKeyboardShortcuts() {
+        document.addEventListener("keydown", function (e) {
+          // Ctrl+Enter to generate image
+          if (e.ctrlKey && e.key === "Enter") {
+            e.preventDefault();
+            generateImage();
+          }
+
+          // Ctrl+S to save
+          if (e.ctrlKey && e.key === "s") {
+            e.preventDefault();
+            saveShayari();
+          }
+
+          // Ctrl+C to copy
+          if (e.ctrlKey && e.key === "c") {
+            e.preventDefault();
+            copyToClipboard();
+          }
+
+          // Ctrl+E for emoji picker
+          if (e.ctrlKey && e.key === "e") {
+            e.preventDefault();
+            toggleEmojiPicker();
+          }
+
+          // Ctrl+D for dark mode toggle
+          if (e.ctrlKey && e.key === "d") {
+            e.preventDefault();
+            toggleTheme();
+          }
+        });
+      }
+
+      // Setup text positioning controls
+      function setupTextPositioning() {
+        document
+          .getElementById("positionUp")
+          .addEventListener("click", () => adjustTextPosition("up"));
+        document
+          .getElementById("positionDown")
+          .addEventListener("click", () => adjustTextPosition("down"));
+        document
+          .getElementById("positionLeft")
+          .addEventListener("click", () => adjustTextPosition("left"));
+        document
+          .getElementById("positionRight")
+          .addEventListener("click", () => adjustTextPosition("right"));
+        document
+          .getElementById("resetPosition")
+          .addEventListener("click", resetTextPosition);
+      }
+
+      // Adjust text position in preview
+      function adjustTextPosition(direction) {
+        const step = 5;
+
+        switch (direction) {
+          case "up":
+            textPosition.y = Math.max(10, textPosition.y - step);
+            break;
+          case "down":
+            textPosition.y = Math.min(90, textPosition.y + step);
+            break;
+          case "left":
+            textPosition.x = Math.max(10, textPosition.x - step);
+            break;
+          case "right":
+            textPosition.x = Math.min(90, textPosition.x + step);
+            break;
+        }
+
+        updateTextPosition();
+      }
+
+      // Reset text position to center
+      function resetTextPosition() {
+        textPosition = { x: 50, y: 50 };
+        updateTextPosition();
+      }
+
+      // Update text position in preview
+      function updateTextPosition() {
+        const previewText = document.getElementById("previewText");
+        previewText.style.left = textPosition.x + "%";
+        previewText.style.top = textPosition.y + "%";
+        previewText.style.transform = "translate(-50%, -50%)";
+
+        // Update position indicator
+        document.getElementById("positionX").textContent = textPosition.x + "%";
+        document.getElementById("positionY").textContent = textPosition.y + "%";
+      }
+
+      // Update character and line count
+      function updateCharCount() {
+        const text = document.getElementById("shayariContent").value;
+        const chars = text.length;
+        const lines = text.split("\n").length;
+
+        document.getElementById("charCount").textContent = chars;
+        document.getElementById("lineCount").textContent = lines;
+      }
+
+      // Debounce auto-save function (less frequent)
+      function debounceAutoSave() {
+        clearTimeout(autoSaveTimer);
+        autoSaveTimer = setTimeout(() => {
+          saveDraft();
+        }, 3000); // Increased from 1s to 3s to reduce frequency
+      }
+
+      // Save draft to localStorage
+      function saveDraft() {
+        if (isAutoSaving) return;
+
+        const content = document.getElementById("shayariContent").value;
+        if (content.trim()) {
+          isAutoSaving = true;
+          localStorage.setItem("shayariDraft", content);
+
+          // Show auto-save indicator briefly
+          const indicator = document.getElementById("autoSaveIndicator");
+          indicator.classList.add("blink");
+          setTimeout(() => {
+            indicator.classList.remove("blink");
+            isAutoSaving = false;
+          }, 1000);
+        }
+      }
+
+      // Load font options
+      function loadFontOptions() {
+        const fontOptions = document.getElementById("fontOptions");
+        const fonts = [
+          {
+            id: "DancingScript",
+            name: "Dancing Script",
+            className: "dancing-script-font",
+          },
+          {
+            id: "GreatVibes",
+            name: "Great Vibes",
+            className: "great-vibes-font",
+          },
+          {
+            id: "Parisienne",
+            name: "Parisienne",
+            className: "parisienne-font",
+          },
+          { id: "Arial", name: "Arial", className: "arial-font" },
+        ];
+
+        fontOptions.innerHTML = "";
+        fonts.forEach((font) => {
+          const div = document.createElement("div");
+          div.className = `font-option ${
+            font.id === selectedFont ? "selected" : ""
+          }`;
+          div.dataset.font = font.id;
+          div.innerHTML = `
+                    <span class="${font.className}">${font.name}</span>
+                    <i class="fas fa-check ${
+                      font.id === selectedFont ? "" : "invisible"
+                    }"></i>
+                `;
+          div.addEventListener("click", () => {
+            document
+              .querySelectorAll(".font-option")
+              .forEach((opt) => opt.classList.remove("selected"));
+            div.classList.add("selected");
+            document
+              .querySelectorAll(".font-option .fa-check")
+              .forEach((icon) => icon.classList.add("invisible"));
+            div.querySelector(".fa-check").classList.remove("invisible");
+            selectedFont = font.id;
+            updatePreviewFont();
+          });
+          fontOptions.appendChild(div);
+        });
+      }
+
+      // Load background options
+      function loadBackgroundOptions(theme) {
+        const backgrounds = {
+          default: [
+            "https://images.unsplash.com/photo-1519681393784-d120267933ba",
+            "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05",
+            "https://images.unsplash.com/photo-1426604966848-d7adac402bff",
+            "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+          ],
+          romantic: [
+            "https://images.unsplash.com/photo-1530825894095-9c184b068fcb",
+            "https://images.unsplash.com/photo-1516487106395-f2d269d6a21c",
+            "https://images.unsplash.com/photo-1518843025960-d60217f226f5",
+            "https://images.unsplash.com/photo-1516487154251-2f08d2e77c4d",
+          ],
+          sad: [
+            "https://images.unsplash.com/photo-1519791883288-dc8bd696e667",
+            "https://images.unsplash.com/photo-1517586979035-853e57c8b313",
+            "https://images.unsplash.com/photo-1519750157634-b6d493a0f77c",
+            "https://images.unsplash.com/photo-1519751138087-5bf79df62d5b",
+          ],
+          motivational: [
+            "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+            "https://images.unsplash.com/photo-1426604966848-d7adac402bff",
+            "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05",
+            "https://images.unsplash.com/photo-1519681393784-d120267933ba",
+          ],
+        };
+
+        availableBackgrounds = backgrounds;
+        const backgroundOptions = document.getElementById("backgroundOptions");
+        backgroundOptions.innerHTML = "";
+
+        backgrounds[theme].forEach((bg, index) => {
+          const img = document.createElement("img");
+          img.src = bg;
+          img.className = "background-option";
+          img.alt = "Background option " + (index + 1);
+          if (index === 0) {
+            img.classList.add("selected");
+            selectedBackground = bg;
+          }
+          img.addEventListener("click", function () {
+            document
+              .querySelectorAll(".background-option")
+              .forEach((opt) => opt.classList.remove("selected"));
+            this.classList.add("selected");
+            selectedBackground = this.src;
+            updatePreviewBackground();
+          });
+          backgroundOptions.appendChild(img);
+        });
+      }
+
+      // Setup color options
+      function setupColorOptions() {
+        document.querySelectorAll(".color-option").forEach((option) => {
+          option.addEventListener("click", function () {
+            document
+              .querySelectorAll(".color-option")
+              .forEach((opt) => opt.classList.remove("selected"));
+            this.classList.add("selected");
+            selectedColor = this.dataset.color;
+            updatePreviewColor();
+          });
+        });
+      }
+
+      // Update preview theme
+      function updatePreviewTheme() {
+        const theme = document.getElementById("themeSelect").value;
+        const previewContainer = document.getElementById("previewContainer");
+        previewContainer.className = "theme-" + theme;
+        updatePreviewBackground();
+      }
+
+      // Update preview background
+      function updatePreviewBackground() {
+        const previewContainer = document.getElementById("previewContainer");
+        previewContainer.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('${selectedBackground}')`;
+      }
+
+      // Update preview font
+      function updatePreviewFont() {
+        const previewText = document.getElementById("previewText");
+        switch (selectedFont) {
+          case "DancingScript":
+            previewText.style.fontFamily = "'Dancing Script', cursive";
+            break;
+          case "GreatVibes":
+            previewText.style.fontFamily = "'Great Vibes', cursive";
+            break;
+          case "Parisienne":
+            previewText.style.fontFamily = "'Parisienne', cursive";
+            break;
+          case "Arial":
+            previewText.style.fontFamily = "Arial, sans-serif";
+            break;
+        }
+      }
+
+      // Update preview color
+      function updatePreviewColor() {
+        document.getElementById("previewText").style.color = selectedColor;
+      }
+
+      // Update text formatting
+      function updateTextFormatting() {
+        const previewText = document.getElementById("previewText");
+
+        // Apply formatting classes
+        previewText.classList.toggle("text-bold", textFormatting.bold);
+        previewText.classList.toggle("text-italic", textFormatting.italic);
+        previewText.classList.toggle(
+          "text-underline",
+          textFormatting.underline
+        );
+      }
+
+      // Adjust preview font size based on text length
+      function adjustPreviewFontSize() {
+        const text = document.getElementById("shayariContent").value;
+        const previewText = document.getElementById("previewText");
+        const fontSizeSlider = document.getElementById("fontSize");
+
+        // If slider was manually adjusted, don't auto-adjust
+        if (fontSizeSlider.dataset.manual === "true") return;
+
+        let fontSize = 24; // Default size
+
+        if (text.length > 200) {
+          fontSize = 18;
+        } else if (text.length > 100) {
+          fontSize = 20;
+        } else if (text.length > 50) {
+          fontSize = 22;
+        }
+
+        previewText.style.fontSize = fontSize + "px";
+        fontSizeSlider.value = fontSize;
+        document.getElementById("fontSizeValue").textContent = fontSize + "px";
+      }
+
+      // Save shayari to database
+      function saveShayari() {
+        const content = document.getElementById("shayariContent").value.trim();
+        if (!content) {
+          showToast("Please enter some text before saving.", "warning");
+          return;
+        }
+
+        if (!confirm("Are you sure you want to save this shayari?")) {
+          return;
+        }
+
+        const theme = document.getElementById("themeSelect").value;
+        const tags = document
+          .getElementById("tagsInput")
+          .value.split(",")
+          .map((tag) => tag.trim())
+          .filter((tag) => tag);
+
+        const shayariData = {
+          content,
+          theme,
+          font: selectedFont,
+          color: selectedColor,
+          background: selectedBackground,
+          tags,
+          formatting: { ...textFormatting },
+          position: { ...textPosition },
+          createdAt: new Date().toISOString(),
+        };
+
+        // Save to localStorage (in a real app, this would be an API call)
+        let savedShayaris = JSON.parse(
+          localStorage.getItem("savedShayaris") || "[]"
+        );
+        savedShayaris.unshift(shayariData);
+        localStorage.setItem("savedShayaris", JSON.stringify(savedShayaris));
+
+        showToast("Shayari saved successfully!", "success");
+        loadRecentPosts();
+
+        // Clear draft
+        localStorage.removeItem("shayariDraft");
+      }
+
+      // Load recent posts
+      function loadRecentPosts() {
+        const recentList = document.getElementById("recentList");
+        const savedShayaris = JSON.parse(
+          localStorage.getItem("savedShayaris") || "[]"
+        );
+
+        if (savedShayaris.length === 0) {
+          recentList.innerHTML =
+            '<p class="text-center text-muted">No saved shayaris yet.</p>';
+          return;
+        }
+
+        recentList.innerHTML = "";
+        savedShayaris.slice(0, 5).forEach((shayari) => {
+          const div = document.createElement("div");
+          div.className = "post-item";
+          div.innerHTML = `
+                    <div class="post-content">${shayari.content}</div>
+                    <div class="post-meta">
+                        <span class="theme-badge">${shayari.theme}</span>
+                        • ${new Date(shayari.createdAt).toLocaleDateString()}
+                    </div>
+                `;
+          div.addEventListener("click", () => {
+            document.getElementById("shayariContent").value = shayari.content;
+            document.getElementById("themeSelect").value = shayari.theme;
+            document.getElementById("previewText").innerText = shayari.content;
+            selectedFont = shayari.font;
+            selectedColor = shayari.color;
+            selectedBackground = shayari.background;
+            textFormatting = shayari.formatting || {
+              bold: false,
+              italic: false,
+              underline: false,
+            };
+            textPosition = shayari.position || { x: 50, y: 50 };
+
+            // Update UI to reflect loaded settings
+            updatePreviewTheme();
+            updatePreviewFont();
+            updatePreviewColor();
+            updateTextFormatting();
+            updateTextPosition();
+            loadFontOptions();
+            loadBackgroundOptions(shayari.theme);
+
+            // Update formatting buttons
+            document
+              .getElementById("boldBtn")
+              .classList.toggle("active", textFormatting.bold);
+            document
+              .getElementById("italicBtn")
+              .classList.toggle("active", textFormatting.italic);
+            document
+              .getElementById("underlineBtn")
+              .classList.toggle("active", textFormatting.underline);
+
+            showToast("Shayari loaded!", "success");
+          });
+          recentList.appendChild(div);
+        });
+      }
+
+      // Generate image from preview
+      function generateImage() {
+        const content = document.getElementById("shayariContent").value.trim();
+        if (!content) {
+          showToast("Please enter some text before generating.", "warning");
+          return;
+        }
+
+        if (!confirm("Generate and download this image?")) {
+          return;
+        }
+
+        isLoading = true;
+        const generateBtn = document.getElementById("generateBtn");
+        generateBtn.disabled = true;
+        generateBtn.innerHTML =
+          '<span class="spinner-border spinner-border-sm" role="status"></span> Generating...';
+
+        // Use html2canvas to capture the preview
+        html2canvas(document.getElementById("previewContainer"), {
+          scale: 3, // Higher scale for better quality
+          useCORS: true,
+          backgroundColor: null,
+        })
+          .then((canvas) => {
+            const link = document.createElement("a");
+            link.download = `verse-craft-${new Date().getTime()}.png`;
+            link.href = canvas.toDataURL("image/png");
+            link.click();
+
+            isLoading = false;
+            generateBtn.disabled = false;
+            generateBtn.innerHTML =
+              '<i class="fas fa-image me-1"></i> Generate';
+
+            showToast(
+              "Image generated and downloaded successfully!",
+              "success"
+            );
+          })
+          .catch((error) => {
+            console.error("Error generating image:", error);
+            isLoading = false;
+            generateBtn.disabled = false;
+            generateBtn.innerHTML =
+              '<i class="fas fa-image me-1"></i> Generate';
+            showToast("Error generating image. Please try again.", "danger");
+          });
+      }
+
+      // Search shayaris
+      function searchShayaris() {
+        const searchText = document
+          .getElementById("searchInput")
+          .value.toLowerCase();
+        const themeFilter = document.getElementById("themeFilter").value;
+        const tagFilter = document
+          .getElementById("tagFilter")
+          .value.toLowerCase();
+        const sortBy = document.getElementById("sortSelect").value;
+
+        const savedShayaris = JSON.parse(
+          localStorage.getItem("savedShayaris") || "[]"
+        );
+
+        let results = savedShayaris.filter((shayari) => {
+          const matchesText = shayari.content
+            .toLowerCase()
+            .includes(searchText);
+          const matchesTheme = !themeFilter || shayari.theme === themeFilter;
+          const matchesTag =
+            !tagFilter ||
+            shayari.tags.some((tag) => tag.toLowerCase().includes(tagFilter));
+
+          return matchesText && matchesTheme && matchesTag;
+        });
+
+        // Sort results
+        switch (sortBy) {
+          case "date_desc":
+            results.sort(
+              (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+            );
+            break;
+          case "date_asc":
+            results.sort(
+              (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+            );
+            break;
+          case "theme":
+            results.sort((a, b) => a.theme.localeCompare(b.theme));
+            break;
+        }
+
+        const resultsContainer = document.getElementById("searchResults");
+
+        if (results.length === 0) {
+          resultsContainer.innerHTML =
+            '<p class="text-center text-muted">No matching shayaris found.</p>';
+          return;
+        }
+
+        resultsContainer.innerHTML = '<h6 class="mb-3">Search Results:</h6>';
+
+        results.forEach((shayari) => {
+          const div = document.createElement("div");
+          div.className = "post-item";
+          div.innerHTML = `
+                    <div class="post-content">${shayari.content}</div>
+                    <div class="post-meta">
+                        <span class="badge bg-primary">${shayari.theme}</span>
+                        ${shayari.tags
+                          .map(
+                            (tag) =>
+                              `<span class="badge bg-secondary ms-1">${tag}</span>`
+                          )
+                          .join("")}
+                        • ${new Date(shayari.createdAt).toLocaleDateString()}
+                    </div>
+                `;
+          div.addEventListener("click", () => {
+            document.getElementById("shayariContent").value = shayari.content;
+            document.getElementById("themeSelect").value = shayari.theme;
+            document.getElementById("previewText").innerText = shayari.content;
+            selectedFont = shayari.font;
+            selectedColor = shayari.color;
+            selectedBackground = shayari.background;
+            textFormatting = shayari.formatting || {
+              bold: false,
+              italic: false,
+              underline: false,
+            };
+            textPosition = shayari.position || { x: 50, y: 50 };
+
+            // Update UI to reflect loaded settings
+            updatePreviewTheme();
+            updatePreviewFont();
+            updatePreviewColor();
+            updateTextFormatting();
+            updateTextPosition();
+            loadFontOptions();
+            loadBackgroundOptions(shayari.theme);
+
+            // Update formatting buttons
+            document
+              .getElementById("boldBtn")
+              .classList.toggle("active", textFormatting.bold);
+            document
+              .getElementById("italicBtn")
+              .classList.toggle("active", textFormatting.italic);
+            document
+              .getElementById("underlineBtn")
+              .classList.toggle("active", textFormatting.underline);
+
+            showToast("Shayari loaded!", "success");
+          });
+          resultsContainer.appendChild(div);
+        });
+      }
+
+      // Copy search results to clipboard
+      function copySearchResults() {
+        const searchResults = document.getElementById("searchResults");
+        const items = searchResults.querySelectorAll(".post-item");
+
+        if (items.length === 0) {
+          showToast("No search results to copy.", "warning");
+          return;
+        }
+
+        let textToCopy = "VerseCraft Search Results:\n\n";
+
+        items.forEach((item) => {
+          const content = item.querySelector(".post-content").textContent;
+          const theme = item.querySelector(".badge").textContent;
+          const date = item
+            .querySelector(".post-meta")
+            .textContent.split("•")[1]
+            .trim();
+
+          textToCopy += `"${content}"\n- ${theme} (${date})\n\n`;
+        });
+
+        navigator.clipboard
+          .writeText(textToCopy)
+          .then(() => {
+            showToast("Search results copied to clipboard!", "success");
+          })
+          .catch((err) => {
+            console.error("Failed to copy: ", err);
+            showToast("Failed to copy search results.", "error");
+          });
+      }
+
+      // Copy recent shayaris to clipboard
+      function copyRecentShayaris() {
+        const recentList = document.getElementById("recentList");
+        const items = recentList.querySelectorAll(".post-item");
+
+        if (items.length === 0) {
+          showToast("No recent shayaris to copy.", "warning");
+          return;
+        }
+
+        let textToCopy = "VerseCraft Recent Shayaris:\n\n";
+
+        items.forEach((item) => {
+          const content = item.querySelector(".post-content").textContent;
+          const theme = item.querySelector(".theme-badge").textContent;
+          const date = item
+            .querySelector(".post-meta")
+            .textContent.split("•")[1]
+            .trim();
+
+          textToCopy += `"${content}"\n- ${theme} (${date})\n\n`;
+        });
+
+        navigator.clipboard
+          .writeText(textToCopy)
+          .then(() => {
+            showToast("Recent shayaris copied to clipboard!", "success");
+          })
+          .catch((err) => {
+            console.error("Failed to copy: ", err);
+            showToast("Failed to copy recent shayaris.", "error");
+          });
+      }
+
+      // Toggle theme (light/dark mode)
+      function toggleTheme() {
+        const currentTheme =
+          document.body.getAttribute("data-theme") || "light";
+        const newTheme = currentTheme === "light" ? "dark" : "light";
+        document.body.setAttribute("data-theme", newTheme);
+
+        const themeIcon = document.querySelector("#themeToggle i");
+        if (newTheme === "dark") {
+          themeIcon.className = "fas fa-sun";
+        } else {
+          themeIcon.className = "fas fa-moon";
+        }
+
+        // Save theme preference
+        localStorage.setItem("theme", newTheme);
+        showToast(
+          `${
+            newTheme.charAt(0).toUpperCase() + newTheme.slice(1)
+          } mode enabled`,
+          "info"
+        );
+      }
+
+      // Copy text to clipboard
+      function copyToClipboard() {
+        const content = document.getElementById("shayariContent").value.trim();
+        if (!content) {
+          showToast("No text to copy.", "warning");
+          return;
+        }
+
+        navigator.clipboard
+          .writeText(content)
+          .then(() => {
+            showToast("Text copied to clipboard!", "success");
+          })
+          .catch((err) => {
+            console.error("Failed to copy: ", err);
+            showToast("Failed to copy text.", "error");
+          });
+      }
+
+      // Text to speech
+      function textToSpeech() {
+        const content = document.getElementById("shayariContent").value.trim();
+        if (!content) {
+          showToast("No text to speak.", "warning");
+          return;
+        }
+
+        if ("speechSynthesis" in window) {
+          const utterance = new SpeechSynthesisUtterance(content);
+
+          // Set voice properties
+          utterance.rate = 0.9;
+          utterance.pitch = 1;
+          utterance.volume = 1;
+
+          // Try to find a natural-sounding voice
+          const voices = speechSynthesis.getVoices();
+          const preferredVoice = voices.find(
+            (voice) => voice.lang.includes("en") && voice.localService === false
+          );
+
+          if (preferredVoice) {
+            utterance.voice = preferredVoice;
+          }
+
+          speechSynthesis.speak(utterance);
+          showToast("Reading text aloud...", "info");
+        } else {
+          showToast(
+            "Text-to-speech is not supported in your browser.",
+            "error"
+          );
+        }
+      }
+
+      // Share on social media
+      function shareOnSocial(platform) {
+        const content = document.getElementById("shayariContent").value.trim();
+        if (!content) {
+          showToast("No text to share.", "warning");
+          return;
+        }
+
+        let url = "";
+        const encodedText = encodeURIComponent(content);
+        const encodedUrl = encodeURIComponent(window.location.href);
+
+        switch (platform) {
+          case "facebook":
+            url = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedText}`;
+            break;
+          case "twitter":
+            url = `https://twitter.com/intent/tweet?text=${encodedText}`;
+            break;
+          case "instagram":
+            // Instagram doesn't have a direct share API, so we'll just copy to clipboard
+            navigator.clipboard
+              .writeText(content)
+              .then(() => {
+                showToast("Text copied to clipboard for Instagram!", "success");
+              })
+              .catch((err) => {
+                console.error("Failed to copy: ", err);
+                showToast("Failed to copy text.", "error");
+              });
+            return;
+          case "whatsapp":
+            url = `https://wa.me/?text=${encodedText}`;
+            break;
+        }
+
+        window.open(url, "_blank");
+        showToast(
+          `Sharing on ${
+            platform.charAt(0).toUpperCase() + platform.slice(1)
+          }...`,
+          "info"
+        );
+      }
+
+      // Show toast notification
+      function showToast(message, type = "info") {
+        // Remove any existing toasts
+        const existingToasts = document.querySelectorAll(".toast-container");
+        existingToasts.forEach((toast) => toast.remove());
+
+        const toast = document.createElement("div");
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `
+                <i class="fas ${
+                  type === "success"
+                    ? "fa-check-circle text-success"
+                    : type === "error"
+                    ? "fa-exclamation-circle text-danger"
+                    : type === "warning"
+                    ? "fa-exclamation-triangle text-warning"
+                    : "fa-info-circle text-info"
+                } me-2"></i>
+                ${message}
+            `;
+
+        const container = document.createElement("div");
+        container.className = "toast-container";
+        container.appendChild(toast);
+
+        document.body.appendChild(container);
+
+        // Auto remove after 3 seconds
+        setTimeout(() => {
+          container.remove();
+        }, 3000);
+      }
+    </script>
+  </body>
+</html>
